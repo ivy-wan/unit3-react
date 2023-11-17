@@ -1,167 +1,216 @@
-# Understanding Components in React.js
+# Props, onClick, and onChange
 
-### Explaining the Folder Structure:
+## Handling onClick and onChange Events in React Components
 
-Before we go further, let's take a look at the folder structure of our React project.
+In React.js, handling user interactions like clicking a button or changing input values involves utilizing event handlers. The example below creates a simple LoginForm component that has an event handler: `handleSubmit`.
 
--   **node_modules:** Contains all required libraries and packages for the React project. If you decide to put your project onto Github, you want to make sure this folder is in your git-ignore!
--   **public:** Holds static files like HTML, CSS, favicon, etc., served to the browser.
--   **src (Source):** Main development folder for components, styles, and JavaScript files.
--   **package-lock.json:** Keeps track of exact dependency versions.
+Create a LoginForm component in your src folder and type in the following code.
 
-### What is a Component in React.js?
+### Creating Functions within a Component
 
--   A component in React.js is a reusable piece of code that represents a part of the user interface (UI). For example, when you are building a webpage, there are aspects of the code that tend to appear multiple times.
-
--   You can think of components as having the same purpose as functions! Functions and components are both good for code resuability.
-
--   Components come in two types, Class components and Function components. In this class we will concentrate on the Function components!
-
-## Explaining App.js:
-
-App.js is the root component! It is the starting point of your project. Let's take a look at each line in this file.
+Within a React component, you can define functions that respond to these events. For instance:
 
 ```javascript
-// Importing the React library, necessary for creating React components
-import React from "react";
+// LoginForm component that takes onSubmit as a prop (We will discuss below.)
+function LoginForm(props) {
+    function handleSubmit(event) {
+        event.preventDefault();
+        // Gets the value in the name field.
+        const name = event.target.name.value;
+        // Passes the name to the parent component
+        props.onSubmit(name);
+    }
 
-// Importing the CSS file for styling the App component. If you look inside App.css, you will see that React starts you out with some default styling.
-import "./App.css";
-
-// Defining the functional component named App
-function App() {
-    // Returns a JSX expression representing the UI of the App component. Every component must return a JSX expression. The JSX looks a lot like HTML! That is because JSX allows writing HTML-like code within the JavaScript.
     return (
-        // JSX structure starts here, enclosed within parentheses
-        <div className="App">
-            <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
-                <p>
-                    Edit <code>src/App.js</code> and save to reload.
-                </p>
-                <a
-                    className="App-link"
-                    href="https://reactjs.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Learn React
-                </a>
-            </header>
-        </div>
-        // Closing div tag
+        <form onSubmit={handleSubmit}>
+            <input type="text" placeholder="Enter your name" name="name" />
+            <button type="submit">Login</button>
+        </form>
     );
-    // Closing parentheses for the return statement
 }
 
-// Exporting the App component to be used in other files
+export default LoginForm;
+```
+
+## Understanding Props in React
+
+Props (short for properties) are a way to pass data from one component to another in React. They are like parameters for a function or arguments for a method. These props can contain any kind of data: strings, numbers, arrays, objects, functions, etc.
+
+```javascript
+// Greeting component that receives a 'name' prop
+const Greeting = (props) => {
+    return (
+        <div>
+            <h2>Hello, {props.name}!</h2>
+            <p>Welcome to our website.</p>
+        </div>
+    );
+};
+
+// ParentComponent passing a 'name' prop to Greeting
+function ParentComponent() {
+    return (
+        <div>
+            <Greeting name="Alice" />
+        </div>
+    );
+}
+```
+
+We are passing name as a prop to Greeting. In the above example, name has a value of "Alice". On your browser, it will render the Greeting component as `Hello, Alice! Welcome to our website.`
+
+## Putting it all together
+
+We may want to ask the user for their name through a login form and use that input as our prop for the Greeting component.
+
+In your src folder, create a Greeting component like follows:
+
+```javascript
+function Greeting(props) {
+    return (
+        <div>
+            <h2>Hello, {props.name}!</h2>
+            <p>Welcome to our website.</p>
+        </div>
+    );
+}
+
+export default Greeting;
+```
+
+Finally, we need to pass the name from the LoginForm component to the Greeting component. However, this is not as easy as just calling the Greeting component in the LoginForm.
+
+Revist your LoginForm component which takes in a onSubmit function as a prop. (Remember that functions can be passed as parameters!)
+
+This onSubmit function actually comes from another component. Let's say it is the App.js. Modify your App.js as follows and add in the LoginForm component. We want the Greeting component to get attached to the screen ONLY when the user presses the submit of the form.
+
+Can you think of a possible way you could do this? Hint: You will need a conditional statement.
+
+```javascript
+import LoginForm from "./LoginForm";
+import Greeting from "./Greeting";
+function App() {
+    return (
+        <div className="App">
+            {/* Comment out last class code*/}
+
+            {/* <h1>Hello React!</h1>
+            <MyComponent />
+            <MyComponent />
+            <MyComponent /> */}
+
+            <LoginForm />
+            <Greeting />
+        </div>
+    );
+}
+
 export default App;
 ```
 
-### Let's modify the App.js component!
+## Storing Variables
 
-Delete all the JSX within the parentheses of the return. We will return our own JSX expression.
+You might have thought of keeping a variable (Maybe a boolean variable) that is either true or false to indicate whether the user has submitted the form or not.
+
+For example, in the following code, I created a boolean submitted, a String userName, and a function handleOnSubmit. The submitted is initally false as the user has not logged in yet. The userName is blank by default, and the handleOnSubmit is passed as a prop to LoginForm, which means that it is only called when the user submits the form.
+
+Another thing I added is the ternary operator, which if you remember is a simplified if/else statement. This is because you cannot have if/else in conjunction with HTML.
+
+Ternary if you forgot has this syntax: `condition ? statement to run if the condition is true : statement to run if the condition is false`
 
 ```javascript
+import LoginForm from "./LoginForm";
+import Greeting from "./Greeting";
 function App() {
+    let submitted = false;
+    let userName = "";
+
+    function handleOnSubmit(name) {
+        submitted = true;
+        userName = name;
+        console.log(submitted);
+    }
+
     return (
-        // NEW CODE
         <div className="App">
-            <h1>Hello, React!</h1>
-            <p>This is a basic React component.</p>
+            {/* Comment out last class code*/}
+
+            {/* <h1>Hello React!</h1>
+            <MyComponent />
+            <MyComponent />
+            <MyComponent /> */}
+
+            {
+                // I will use a ternary operator! What this is saying is: If submitted is false, display the LoginForm. Else display the Greeting.
+                !submitted ? (
+                    <LoginForm onSubmit={handleOnSubmit} />
+                ) : (
+                    <Greeting name={userName} />
+                )
+            }
         </div>
     );
 }
+
+export default App;
 ```
 
-### Steps to Run a React Project
+### Rip it didn't work...
 
-1. **Start the development server:**
-    - Run the command `npm start`.
-    - This command will start the development server and automatically open the React application in your default web browser.
-2. **View the React App:**
-    - After executing npm start, a new tab or window should open in your web browser displaying your React application.
-    - If it doesn't open automatically, you can manually visit http://localhost:3000 in your web browser to view the running React application.
+Why didn't our plan work as intended! If you pull up the inspect elements, you should see that when you console.log submitted, it did indeed change to true!
 
-**Additional Notes:**
-While the development server is running (npm start), you can continue to work on your React project. Any changes made to the code will be reflected in the browser after saving the files.
-Remember to keep the terminal window open while developing to keep the development server running.
+What happened is that our variable changed, but we need to refresh the page to have the new change reflected. However, refresh is not quite the right word. Instead we want React to re-render the page!
 
-#### Stopping the Development Server:
+Well then, how do we get React to re-render the page?
 
--   To stop the development server and terminate the running React application:
+## States
 
--   In the terminal or command prompt, press Ctrl + C.
-    You'll be prompted to confirm terminating the process. Press Y and then Enter to stop the server.
+We want to keep track of the submitted variable but unfortunatly a simple variable is not enough. We need states.
 
-# Step-by-Step Guide to Creating a Component in React
+Instead of creating variables, we can use React hooks:
 
-Follow these steps to create a new component in a React.js project:
+```javascript
+let [submitted, setSubmitted] = useState(false);
+let [userName, setUserName] = useState("");
+```
 
-1. **Create a New Component File:**
+This is a complex topic that we will dive more into tomorrow. As for today, copy the below code into your App.js.
 
-    - Navigate to the `src` directory within your React project.
-    - Create a new file for your component (e.g., `MyComponent.js`).
+```javascript
+import LoginForm from "./LoginForm";
+import Greeting from "./Greeting";
+import React, { useState } from "react";
 
-2. **Write the Component Code:**
+function App() {
+    let [submitted, setSubmitted] = useState(false);
+    let [userName, setUserName] = useState("");
 
-    - Inside the newly created file, define your React component using a functional approach.
-    - For a functional component:
+    function handleOnSubmit(name) {
+        setSubmitted(true);
+        setUserName(name);
+        console.log(submitted);
+    }
 
-        ```javascript
-        import React from "react";
+    return (
+        <div className="App">
+            {/* Comment out last class code*/}
 
-        function MyComponent() {
-            return (
-                <div>
-                    <h1>My name is [Your name]</h1>
-                </div>
-            );
-        }
+            {/* <h1>Hello React!</h1>
+            <MyComponent />
+            <MyComponent />
+            <MyComponent /> */}
 
-        export default MyComponent;
-        ```
-
-        While we will not be going over the class-based component, here is a snipet of the class-based approach if you are curious:
-
-        ```javascript
-        import React, { Component } from "react";
-
-        class MyComponent extends Component {
-            render() {
-                return (
-                    <div>
-                        <h1>My name is [Your name]</h1>
-                    </div>
-                );
+            {
+                // I will use a ternary operator! What this is saying is: If submitted is false, display the LoginForm. Else display the Greeting.
+                !submitted ? (
+                    <LoginForm onSubmit={handleOnSubmit} />
+                ) : (
+                    <Greeting name={userName} />
+                )
             }
-        }
+        </div>
+    );
+}
 
-        export default MyComponent;
-        ```
-
-3. **Export the Component:**
-
-    - At the end of the file, export your component using `export default MyComponent;`.
-    - This allows other files within your project to import and use the component.
-
-4. **Use the Component in Other Files (e.g., App.js):**
-    - Import your newly created component into the file where you want to use it.
-    - In the file (e.g., `App.js`), import the component at the top:
-        ```javascript
-        import MyComponent from "./MyComponent";
-        ```
-    - Then, within the JSX code where you want to use the component, insert it using its name as a JSX element:
-        ```javascript
-        function App() {
-            return (
-                <div>
-                    <h1>Welcome to My App</h1>
-                    <MyComponent />
-                </div>
-            );
-        }
-        ```
-    - This will render your `MyComponent` within the `App` component. This is super cool!
-
-By following these steps, you can create reusable components in React and use them within your application's structure.
+export default App;
+```
