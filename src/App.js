@@ -1,12 +1,12 @@
 import React from "react";
-import LoginForm from './LoginForm'
+import LoginForm from "./LoginForm";
+import Counter from "./Counter";
 
 function App() {
-
     let submitted = false;
     let userName = "";
 
-    function handleOnSubmit(name){
+    function handleOnSubmit(name) {
         submitted = true;
         userName = name;
         console.log(submitted);
@@ -14,15 +14,7 @@ function App() {
 
     return (
         <div className="App">
-            {/* <h1>Hello React!</h1>
-            <MyComponent />
-            <MyComponent />
-            <MyComponent /> */}
-            {
-                (!submitted) ? <LoginForm onSubmit={handleOnSubmit}/> : <Greeting name={userName}/>
-            }
-                
-            
+            <Counter />
         </div>
     );
 }
